@@ -73,6 +73,26 @@ All paths are under `/kaggle/working/medmisbench_study/`. Every run folder is ti
 | `analysis/counterfactual_metrics_<ts>/` | Flip-rate tables, favoured groups, hypothesis assessment, and the `flip_rates`/`flip_outcomes` figures |
 | `analysis/security_metrics_<ts>/` | `report.md`, metric tables, `run_validation.json`, and the `attack_effects` figure |
 
+## Saved outputs
+
+The `outputs/` folder holds the complete machine-readable results behind every notebook. Each zip is an archive of `/kaggle/working/medmisbench_study` from its Kaggle session.
+
+| Zip | Session | Contents | Used by |
+| --- | --- | --- | --- |
+| [`outputs/medmisbench_outputs_main_run_20261021.zip`](outputs/medmisbench_outputs_main_run_20261021.zip) (18 MB) | Main run, 21 Oct 2026 | `data/20261021T151301_804139Z`, `results/baseline_20261021T152002_295114Z`, `results/stress_20261021T153447_400500Z` (with `h1_analysis/`), `results/counterfactual_20261021T154514_370820Z`, `results/security_20261021T161101_684191Z`, `results/interpretability_20261021T165311_774719Z`, `analysis/counterfactual_metrics_*`, `analysis/security_metrics_*` | `baseline`, notebooks 1–4 |
+| [`outputs/medmisbench_outputs_intervention_20261021.zip`](outputs/medmisbench_outputs_intervention_20261021.zip) (5 MB) | Later intervention session, 21 Oct 2026 | `results/top2_guard_20261021T174302_584377Z`, plus that session's `data/` preparation and Hugging Face dataset cache | `5_intervention` |
+
+The run folder names match the paths printed in the notebook outputs, and every folder keeps its `manifest.json` with SHA-256 checksums. Figures (`layer_comparison.png`, `flip_rates`, `flip_outcomes`, `attack_effects`) are inside these zips.
+
+**Re-running the analysis without the GPU steps.** Upload a zip to Kaggle as a dataset, then restore it in a notebook:
+
+```bash
+mkdir -p /kaggle/working/medmisbench_study
+unzip -q /kaggle/input/<your-dataset>/medmisbench_outputs_main_run_20261021.zip -d /kaggle/working/medmisbench_study
+```
+
+The analysis cells (baseline metrics, counterfactual metrics, security analysis) then find these runs through their default `None` settings. The H1 cell's hard-coded `stress_20261021T153447_400500Z` folder is the one in this zip. `5_intervention.ipynb` with `RERUN_MODELS = False` replays the gate on the restored `stress_*` run without a GPU. This replay gives the same result as the recorded fresh-inference run: 13.3% → 33.3% (Llama) and 13.3% → 23.3% (Qwen), with identical flags, helps and harms.
+
 ## Recorded results
 
 | Dimension | Llama-3.2-3B | Qwen2.5-3B |
